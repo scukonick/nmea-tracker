@@ -1,23 +1,13 @@
-# Nmea tracker
+package main
 
-## Protocol
-As it's first version, protocol is extremely simple.
-Clients should connect by tcp to nmea.scukonick.rocks:3999 and send message/messages.
+import (
+	"io/ioutil"
+	"strings"
+	"testing"
+)
 
-The first line should be like HTTP header, containing <b>token</b> of device sending this data.
-Token should be ASCII line of 25 symbols.
-Using this token you can log in on the site and see last history of the device.<br>
-The next lines are just NMEA lines received from GPS.
-
-Lines could be separated by `<CR><LF>` as well as by `<LF>`.
-
-There is no 'end-of-conversation' symbol, it's ok just to close connection from the device.
-If device is not closing connection the server would close it after some timeout.
-
-Example conversation:
-
-```
-Token: 12312412412
+func TestGetPoints(t *testing.T) {
+	input := `
 $GPRMC,002454,A,3553.5295,N,13938.6570,E,0.0,43.1,180700,7.1,W,A*3F
 $GPRMB,A,,,,,,,,,,,,A,A*0B
 $GPGGA,002454,3553.5295,N,13938.6570,E,1,05,2.2,18.3,M,39.0,M,,*7F
@@ -40,5 +30,22 @@ $GPGSV,3,3,09,24,12,282,00*4D
 $GPGLL,3553.5295,N,13938.6570,E,002454,A,A*4F
 $HCHDG,101.1,,,7.1,W*3C
 $GPRTE,1,1,c,*37
-$GPRMC,002456,A,3553.5295,N,13938.6570,E,0.0,43.1,180700,7.1,W,A*3D
-```
+$GPRMC,002456,A,3553.5295,N,13938.6570,E,0.0,43.1,180700,7.1,W,A*3D`
+	c := &Conversation{
+		RemoteAddr: "1.2.3.4",
+		Token:      "token",
+		Body:       ioutil.NopCloser(strings.NewReader(input)),
+	}
+	points := make([]*Point, 0, 3)
+	for p := range c.GetPoints() {
+		points = append(points, p)
+	}
+	if len(points) != 3 {
+		t.Errorf("Expected len of points 3, got %d", len(points))
+	}
+	p := points[0]
+	timestr := p.TimeStamp.Format("020106150405")
+	if timestr != "180700002454" {
+		t.Errorf("Expected timestamp: 180700002454, got: %s", timestr)
+	}
+}

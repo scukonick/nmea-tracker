@@ -1,32 +1,21 @@
 package main
 
 import (
-	"io"
+	"database/sql"
 	"log"
-	"net"
+
+	_ "github.com/lib/pq"
 )
 
 func main() {
-	// Listen on TCP port 2000 on all interfaces.
-	l, err := net.Listen("tcp", ":2000")
+	db, err := sql.Open("postgres", "postgres://nmea:qwerty@localhost:5433/nmea?sslmode=disable")
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Failed to connect to the DB: %v", err)
 	}
-	defer l.Close()
-	for {
-		// Wait for a connection.
-		conn, err := l.Accept()
-		if err != nil {
-			log.Fatal(err)
-		}
-		// Handle the connection in a new goroutine.
-		// The loop then returns to accepting, so that
-		// multiple connections may be served concurrently.
-		go func(c net.Conn) {
-			// Echo all incoming data.
-			io.Copy(c, c)
-			// Shut down the connection.
-			c.Close()
-		}(conn)
-	}
+
+	handler := NewPGConversationHandler(db)
+	// Listen on TCP port 2000 on all interfaces.
+	nmeaServer := NewNmeaServer(":3000")
+
+	nmeaServer.Serve(handler)
 }
