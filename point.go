@@ -20,12 +20,11 @@ const (
 
 // Point represents one track point
 type Point struct {
-	Type      string    // Type of source NMEA message
-	Lat       float64   // Latitude in degrees
-	Lng       float64   // Longtitude in degrees
-	Speed     float32   // Speed in m/s
-	Direction float32   // Direction in degrees
-	TimeStamp time.Time // Time stamp of the point
+	Type      string      // Type of source NMEA message
+	Speed     float32     // Speed in m/s
+	Direction float32     // Direction in degrees
+	TimeStamp time.Time   // Time stamp of the point
+	Location  *PGLocation // Location of the point
 }
 
 // NewPointFromNMEA parses input NMEA string
@@ -59,10 +58,11 @@ func NewPointFromNMEA(input string) (*Point, error) {
 		return nil, err
 	}
 
+	location := NewPGLocation(lngFloat, latFloat)
+
 	p := &Point{
 		Type:      gprmc.Type,
-		Lat:       latFloat,
-		Lng:       lngFloat,
+		Location:  location,
 		Speed:     speed,
 		Direction: float32(gprmc.Course),
 		TimeStamp: timeStamp,

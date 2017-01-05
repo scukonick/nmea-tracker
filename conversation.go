@@ -35,6 +35,14 @@ func (c *Conversation) GetPoints() chan *Point {
 		if scanner.Err() != nil {
 			log.Printf("Oops, error: %v", scanner.Err())
 		}
+		log.Printf("No more points")
 	}()
 	return output
+}
+
+// Close closes connection of conversation.
+// This function should be used when we by some reason
+// don't want to read from socket anymore
+func (c *Conversation) Close() error {
+	return c.Body.Close()
 }

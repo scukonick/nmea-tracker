@@ -13,7 +13,8 @@ func main() {
 		log.Fatalf("Failed to connect to the DB: %v", err)
 	}
 
-	handler := NewPGConversationHandler(db)
+	informer := NewPGInformer(db)
+	handler := NewPGConversationHandler(informer)
 	// Listen on TCP port 2000 on all interfaces.
 	nmeaServer := NewNmeaServer(":3000")
 
