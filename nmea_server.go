@@ -43,6 +43,7 @@ func (s *NmeaServer) Serve(handler ConversationHandler) {
 		if err != nil {
 			log.Printf("WARN: not correct input stream")
 			conn.Close()
+			continue
 		}
 
 		go handler.Handle(conversation)

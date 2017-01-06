@@ -20,11 +20,11 @@ const (
 
 // Point represents one track point
 type Point struct {
-	Type      string      // Type of source NMEA message
-	Speed     float32     // Speed in m/s
-	Direction float32     // Direction in degrees
-	TimeStamp time.Time   // Time stamp of the point
-	Location  *PGLocation // Location of the point
+	Type      string      `json:"type"`      // Type of source NMEA message
+	Speed     float32     `json:"speed"`     // Speed in m/s
+	Direction float32     `json:"direction"` // Direction in degrees
+	TimeStamp time.Time   `json:"timestamp"` // Time stamp of the point
+	Location  *PGLocation `json:"location"`  // Location of the point
 }
 
 // NewPointFromNMEA parses input NMEA string

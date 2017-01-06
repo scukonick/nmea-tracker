@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"log"
+	"net/http"
 
 	_ "github.com/lib/pq"
 )
@@ -17,6 +18,8 @@ func main() {
 	handler := NewPGConversationHandler(informer)
 	// Listen on TCP port 2000 on all interfaces.
 	nmeaServer := NewNmeaServer(":3000")
+	go nmeaServer.Serve(handler)
 
-	nmeaServer.Serve(handler)
+	apiServer := NewAPIServer(informer)
+	log.Fatal(http.ListenAndServe(":4000", apiServer))
 }
