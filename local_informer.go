@@ -56,6 +56,8 @@ func (i *PGInformer) InsertPoint(p *Point, tokenID int32) error {
 	return err
 }
 
+// GetPoints returns all the points of device identified by
+// token ordered by time_stamp desc
 func (i *PGInformer) GetPoints(token string) ([]*Point, error) {
 	query := `SELECT points.speed, points.direction, points.time_stamp,
 	ST_X(points.location::geometry), ST_Y(points.location::geometry)

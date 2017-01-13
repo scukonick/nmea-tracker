@@ -6,10 +6,12 @@ import (
 	"net/http"
 )
 
+// APIServer serves all the requests from the frontend
 type APIServer struct {
 	informer Informer
 }
 
+// NewAPIServer returns a pointer to newly initialized APIServer
 func NewAPIServer(informer Informer) *APIServer {
 	i := &APIServer{
 		informer: informer,
@@ -17,6 +19,7 @@ func NewAPIServer(informer Informer) *APIServer {
 	return i
 }
 
+// ServeHTTP implements http.Handler interface
 func (s *APIServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Request %s from %s", r.URL, r.RemoteAddr)
 	token := r.URL.Query().Get("token")
